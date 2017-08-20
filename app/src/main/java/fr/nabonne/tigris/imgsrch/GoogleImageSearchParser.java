@@ -1,5 +1,6 @@
 package fr.nabonne.tigris.imgsrch;
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -32,8 +33,8 @@ public class GoogleImageSearchParser implements MVPContracts.ISearchModel {
         this.curQuery = query;// If curQuery is non null (incomplete query) it will be discarded
         this.curObserver = observer;
 
-//        String queryString = query.queryString;//TODO format queryString to valid URL param
-        String queryString = "puppies";
+        String queryString = Uri.encode(query.queryString);//TODO format queryString to valid URL param
+//        String queryString = "puppies";
         String queryParams = "q=" + queryString + "&tbm=isch";
 
         String queryUrl = apiUrl + queryParams;
