@@ -10,6 +10,9 @@ import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -18,10 +21,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener,
+        MVPContracts.ISearchView{
 
     MVPContracts.ISearchModel model;
-    List<MVPContracts.ISearchModel.ImageData> imagesData = new ArrayList<>();
+    MVPContracts.ISearchPresenter presenter;
     ImagesDataAdapter adapter;
     SearchView searchView;
     @BindView(R.id.search_toolbar)
@@ -30,6 +34,12 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     @BindView(R.id.results_view)
     RecyclerView resultsView;
 
+    @BindView(R.id.idle_text_view)
+    TextView textView;
+
+    @BindView(R.id.loading_animation_view)
+    ProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,14 +47,21 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
-        model = new GoogleImageSearchParser();
-
         GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
         resultsView.setLayoutManager(layoutManager);
-
-        adapter = new ImagesDataAdapter(imagesData);
+        adapter = new ImagesDataAdapter();
         resultsView.setAdapter(adapter);
 
+        //Now get the presenter from app and register
+        ImgSrchApp app = (ImgSrchApp) getApplication();
+        presenter = app.getPresenter();
+        presenter.registerView(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.unregisterView(this);
     }
 
     @Override
@@ -66,22 +83,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     @Override
     public boolean onQueryTextSubmit(String queryString) {
-        model.query(new MVPContracts.ISearchModel.Query(queryString),
-                new MVPContracts.ISearchModel.QueryObserver() {
-                    @Override
-                    public void onResults(MVPContracts.ISearchModel.Query query) {
-                        String toastString = query.errorString;
-                        if (query.results != null) {
-                            toastString = query.results.size() + " results";
-                            imagesData.clear();
-                            imagesData.addAll(query.results);
-                            adapter.notifyDataSetChanged();
-                        }
-                        if (toastString == null)
-                            toastString = "UNKNOWN ERROR";
-                        Toast.makeText(SearchActivity.this, toastString, Toast.LENGTH_SHORT).show();
-                    }
-                });
+        presenter.onActionSearch(queryString);
         searchView.clearFocus();
         return false;
     }
@@ -89,5 +91,33 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     @Override
     public boolean onQueryTextChange(String newText) {
         return false;
+    }
+
+    @Override
+    public void showLoading() {
+        progressBar.setVisibility(View.VISIBLE);
+        textView.setVisibility(View.GONE);
+        resultsView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showError() {
+        //fetch state from presenter
+        textView.setText(presenter.getCurQuery().errorString);
+
+        progressBar.setVisibility(View.GONE);
+        textView.setVisibility(View.VISIBLE);
+        resultsView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showResults() {
+        //fetch state from presenter
+        adapter.setData(presenter.getImagesData());
+        adapter.notifyDataSetChanged();
+
+        progressBar.setVisibility(View.GONE);
+        textView.setVisibility(View.GONE);
+        resultsView.setVisibility(View.VISIBLE);
     }
 }

@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="fr.nabonne.tigris.imgsrch.SearchActivity">
 
+    <!-- below toolbar height uses "?attr/actionBarSize"
+     but AndroidStudio keeps changing it to its value -->
     <android.support.v7.widget.Toolbar
         android:id="@+id/search_toolbar"
         android:layout_width="match_parent"
@@ -13,12 +15,32 @@
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        android:layout_alignParentTop="true"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <TextView
+        android:id="@+id/idle_text_view"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:paddingTop="?attr/actionBarSize"
+        android:layout_centerInParent="true"
+        android:text="@string/welcome"
+        android:visibility="visible"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/results_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        />
+        android:paddingTop="?attr/actionBarSize"
+        android:visibility="gone"/>
 
-</android.support.constraint.ConstraintLayout>
+    <ProgressBar
+        android:id="@+id/loading_animation_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="?attr/actionBarSize"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
+</RelativeLayout>

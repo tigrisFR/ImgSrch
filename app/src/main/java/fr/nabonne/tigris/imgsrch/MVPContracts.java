@@ -38,12 +38,18 @@ public interface MVPContracts {
     }
 
     interface ISearchPresenter {
+        void registerView(ISearchView searchView);
+        void unregisterView(ISearchView searchView);
+
         void onActionSearch(String queryString);
+
+        ISearchModel.Query getCurQuery();
+        List<ISearchModel.ImageData> getImagesData();
     }
 
     interface ISearchView{
         void showLoading();
-        void showError(String errorString);
-        void showResults(List<ISearchModel.ImageData> results);
+        void showError();
+        void showResults();
     }
 }

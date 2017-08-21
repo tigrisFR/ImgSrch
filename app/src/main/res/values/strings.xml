@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">ImgSrch</string>
     <string name="action_search">Search Images</string>
+    <string name="welcome">Welcome! Use the toolbar to search for images.</string>
 </resources>

@@ -20,9 +20,10 @@ import butterknife.ButterKnife;
  */
 
 public class ImagesDataAdapter extends RecyclerView.Adapter {
-    final List<MVPContracts.ISearchModel.ImageData> data;
 
-    public ImagesDataAdapter(List<MVPContracts.ISearchModel.ImageData> data) {
+    private List<MVPContracts.ISearchModel.ImageData> data;
+
+    public void setData(List<MVPContracts.ISearchModel.ImageData> data) {
         this.data = data;
     }
 
